@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>💖 jsp’s ✨ enchanted task portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap');
+    
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(-45deg, #71d191, #bab8d1, #f8d1ee, #cdb0e9);
+            background-size: 400% 400%;
+            animation: bgFloat 5s ease infinite;
+        }
+    
+        @keyframes bgFloat {
+            0% {
+                background-position: 0% 50%;
+            }
+    
+            50% {
+                background-position: 100% 50%;
+            }
+    
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+    
+        .glow {
+            box-shadow: 0 0 25px #cb5294, 0 40px 40px #651e71;
+        }
+    </style>
+      
+      
+</head>
+
+<body class="flex flex-col items-center justify-center min-h-screen p-6 sparkle">
+    <div
+        class="bg-white bg-opacity-90 rounded-3xl glow shadow-2xl p-8 max-w-md w-full border-4 border-pink-300 transition hover:scale-105 duration-300 ease-in-out">
+        <h1 class="text-4xl text-pink-600 font-extrabold mb-4 text-center drop-shadow">jsp's task box</h1>
+        <p class="text-md text-gray-700 mb-6 text-center italic">
+            please note that submitting a task does not guarantee approval by the <br>
+            <span class="text-pink-600 font-bold">Defense Against Neurotypical Department™</span> <br>
+        </p>
+
+        <form id="taskForm" class="flex flex-col gap-4">
+            <input type="text" id="task" name="entry.783455873" required placeholder="write your task"
+                class="p-3 rounded-xl border border-pink-300 bg-pink-50 focus:ring-2 focus:ring-pink-400 transition" />
+
+            <select name="entry.1926260237" id="vibe"
+                class="p-3 rounded-xl border border-pink-300 bg-pink-50 focus:ring-2 focus:ring-pink-400 transition">
+                <option value="urgent">🚨 urgent</option>
+                <option value="aesthetic">🫧 aesthetic</option>
+                <option value="cp hell">🔥 cp hell</option>
+                <option value="pls no">😩 pls no</option>
+                <option value="msti">🪩 masti</option>
+            </select>
+
+            <input type="hidden" name="entry.21773187" id="taskId" />
+            <input type="hidden" name="entry.1269721085" id="status" />
+
+            <button type="submit"
+                class="bg-gradient-to-r from-pink-400 to-pink-600 hover:from-pink-500 hover:to-pink-700 text-white font-bold py-2 rounded-xl transition shadow-md">
+                💌 send to jsp <br>(pls remember she has adhd and shes just a girl)
+            </button>
+
+            <p id="confirmation" class="text-green-700 hidden text-center mt-2 font-medium">
+                🌟 task submitted successfully! 🌟<br>
+                <span class="text-pink-600 font-semibold">
+                    please note: submission ≠ approval by the <br>
+                    Defense Against Neurotypical Department™
+                </span><br>
+                check status <a href="status.html" class="text-violet-600 underline hover:text-violet-800">here</a>
+            </p>
+
+            <p id="task-id-display" class="text-purple-700 hidden text-center font-mono text-sm mt-2">
+                🧾 task ID: <span id="task-id-value" class="font-bold text-pink-800"></span> <br>
+                🔮 save this to check your enchanted progress
+            </p>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('taskForm');
+        const confirmation = document.getElementById('confirmation');
+        const taskIdInput = document.getElementById('taskId');
+        const statusdef = document.getElementById('status');
+        const taskIdDisplay = document.getElementById('task-id-display');
+        const taskIdValue = document.getElementById('task-id-value');
+
+        function generateUniqueTaskID() {
+            const time = Date.now().toString(36);
+            const rand = Math.floor(1000 + Math.random() * 9000);
+            return `jsp-${time}-${rand}`;
+        }
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const generatedId = generateUniqueTaskID();
+            taskIdInput.value = generatedId;
+            statusdef.value = "awaiting response";
+
+            const data = new FormData(form);
+
+            fetch('https://docs.google.com/forms/d/e/1FAIpQLSduyNKNdZ4AhEvYeqEjKDkZiPHVbSbSBMHpuG2OdK3A8zFQbw/formResponse', {
+                method: 'POST',
+                mode: 'no-cors',
+                body: data,
+            });
+
+            taskIdValue.textContent = generatedId;
+            confirmation.classList.remove('hidden');
+            taskIdDisplay.classList.remove('hidden');
+
+            form.reset();
+        });
+    </script>
+</body>
+
+</html>
