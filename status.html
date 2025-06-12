@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>📜 jsp’s task receipt</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #ffe4ec, #fff8f0);
+            animation: floaty 10s ease-in-out infinite;
+        }
+
+        @keyframes floaty {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .receipt-box {
+            font-family: 'Courier New', monospace;
+            background: #fffdfb;
+            box-shadow: 0 4px 15px rgba(249, 38, 114, 0.2);
+            padding: 2rem;
+            border: 2px dashed #f92672;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col items-center justify-center min-h-screen p-6">
+
+    <div class="receipt-box rounded-3xl max-w-md w-full mb-6">
+        <h1 class="text-2xl font-bold text-pink-700 text-center mb-4">🎟️ task status receipt</h1>
+        <form id="statusForm" class="flex flex-col gap-4 mb-2">
+            <input type="text" id="taskId" placeholder="enter your task id (e.g., jsp-abc123-4567)" required
+                class="p-3 rounded-lg border border-pink-400 text-sm" />
+            <button type="submit"
+                class="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 rounded-lg transition">
+                check status 🔍
+            </button>
+        </form>
+        <p id="error" class="text-red-500 text-center hidden mt-2">task not found 😵‍💫</p>
+    </div>
+
+    <!-- ✨ separate receipt container ✨ -->
+    <div id="result" class="receipt-box rounded-3xl max-w-md w-full hidden">
+        <h2 class="text-xl font-semibold text-pink-600 mb-4 text-center">🧾 here’s your receipt!</h2>
+        <div class="text-sm text-gray-800 space-y-2">
+            <p><strong>🧠 Task:</strong> <span id="taskText"></span></p>
+            <p><strong>🎨 Vibe:</strong> <span id="vibe"></span></p>
+            <p><strong>📌 Status:</strong> <span id="status"></span></p>
+            <p><strong>🕰️ Submitted:</strong> <span id="timestamp"></span></p>
+            <p><strong>⏳ Time Elapsed:</strong> <span id="elapsed"></span></p>
+        </div>
+    </div>
+  
+
+    <script>
+        const form = document.getElementById('statusForm');
+        const endpoint = "https://script.google.com/macros/s/AKfycbxtUS9EaELqPAXAp6AgPBC1Tcf_nRSrYx-V9tKpSax_L6Mkm8NHRh-yLby_wrjEdiEX/exec";
+
+        // format IST time in cute readable format
+            function formatIST(dateStr) {
+                const date = new Date(dateStr);
+                const options = {
+                    timeZone: 'Asia/Kolkata',
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true,
+                };
+                return new Intl.DateTimeFormat('en-IN', options).format(date);
+            }
+
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('taskId').value.trim();
+            const resDiv = document.getElementById('result');
+            const err = document.getElementById('error');
+            resDiv.classList.add('hidden');
+            err.classList.add('hidden');
+
+            try {
+                const response = await fetch(`${endpoint}?id=${encodeURIComponent(id)}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    err.classList.remove('hidden');
+                } else {
+                    document.getElementById('taskText').textContent = data.task;
+                    document.getElementById('vibe').textContent = data.vibe;
+                    document.getElementById('status').textContent = data.status;
+                    document.getElementById('timestamp').textContent = formatIST(data.Timestamp);
+
+                    const submitted = new Date(data.Timestamp);
+                    const now = new Date();
+                    const diffMs = now - submitted;
+                    const mins = Math.floor(diffMs / 60000);
+                    const hours = Math.floor(mins / 60);
+                    const days = Math.floor(hours / 24);
+
+                    let elapsed = "";
+                    if (days > 0) elapsed += `${days}d `;
+                    if (hours % 24 > 0) elapsed += `${hours % 24}h `;
+                    if (mins % 60 > 0) elapsed += `${mins % 60}m`;
+                    if (!elapsed) elapsed = "just now ✨";
+
+                    document.getElementById('elapsed').textContent = elapsed.trim();
+
+                    resDiv.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error(err);
+                err.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+
+</html>
